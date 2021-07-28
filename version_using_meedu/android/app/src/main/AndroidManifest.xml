@@ -10,7 +10,7 @@
         android:icon="@mipmap/ic_launcher">
 
  <meta-data android:name="com.google.android.geo.API_KEY"
-               android:value="AIzaSyBrOX9rfkyXfWJxTVGRpvJRmpcuG4JG_HY"/>
+               android:value="YOUR_GOOGLE_MAPS_API_KEY"/>
 
        <service android:name=".MyForegroundService"/>
 

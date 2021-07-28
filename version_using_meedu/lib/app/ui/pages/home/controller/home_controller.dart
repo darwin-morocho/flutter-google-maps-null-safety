@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'package:flutter/widgets.dart' show ChangeNotifier;
+import 'package:flutter_meedu/flutter_meedu.dart';
+import 'package:flutter_meedu/meedu.dart';
 import 'package:google_maps/app/data/providers/local/geolocator_wrapper.dart';
 import 'package:google_maps/app/domain/models/place.dart';
 import 'package:google_maps/app/domain/repositories/brackground_location_repository.dart';
@@ -15,43 +16,31 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'home_state.dart';
 
-class HomeController extends ChangeNotifier {
-  HomeState _state = HomeState.initialState;
-  HomeState get state => _state;
-
+class HomeController extends StateNotifier<HomeState> {
   StreamSubscription? _gpsSubscription, _postionSubscription;
   GoogleMapController? _mapController;
 
-  final GeolocatorWrapper _geolocator;
-  final RoutesRepository _routesRepository;
-  final ReverseGeocodeRepository _reverseGeocodeRepository;
-  final BackgroundLocationRepository _backgroundLocationRepository;
+  final _geolocator = Get.i.find<GeolocatorWrapper>();
+  final _routesRepository = Get.i.find<RoutesRepository>();
+  final _reverseGeocodeRepository = Get.i.find<ReverseGeocodeRepository>();
+  final _backgroundLocationRepository = Get.i.find<BackgroundLocationRepository>();
 
   BitmapDescriptor? _dotMarker;
   LatLng? _cameraPosition;
 
-  bool get originAndDestinationReady => _state.origin != null && _state.destination != null;
-
-  HomeController({
-    required GeolocatorWrapper geolocator,
-    required RoutesRepository routesRepository,
-    required ReverseGeocodeRepository reverseGeocodeRepository,
-    required BackgroundLocationRepository backgroundLocationRepository,
-  })  : _routesRepository = routesRepository,
-        _geolocator = geolocator,
-        _reverseGeocodeRepository = reverseGeocodeRepository,
-        _backgroundLocationRepository = backgroundLocationRepository {
+  HomeController() : super(HomeState.initialState) {
     _init();
   }
 
+  bool get originAndDestinationReady => state.origin != null && state.destination != null;
+
   Future<void> _init() async {
     final gpsEnabled = await _geolocator.isLocationServiceEnabled;
-    _state = state.copyWith(gpsEnabled: gpsEnabled);
+    state = state.copyWith(gpsEnabled: gpsEnabled);
 
     _gpsSubscription = _geolocator.onServiceEnabled.listen(
       (enabled) {
-        _state = state.copyWith(gpsEnabled: enabled);
-        notifyListeners();
+        state = state.copyWith(gpsEnabled: enabled);
       },
     );
 
@@ -68,7 +57,6 @@ class HomeController extends ChangeNotifier {
         if (!initialized) {
           _setInitialPosition(position);
           initialized = true;
-          notifyListeners();
         }
         CurrentPosition.i.setValue(
           LatLng(position.latitude, position.longitude),
@@ -79,7 +67,7 @@ class HomeController extends ChangeNotifier {
 
   void _setInitialPosition(Position position) {
     if (state.gpsEnabled && state.initialPosition == null) {
-      _state = state.copyWith(
+      state = state.copyWith(
         initialPosition: LatLng(
           position.latitude,
           position.longitude,
@@ -100,10 +88,9 @@ class HomeController extends ChangeNotifier {
     if (originAndDestinationReady) {
       clearData(true);
     } else {
-      _state = _state.copyWith(
+      state = state.copyWith(
         fetching: true,
       );
-      notifyListeners();
     }
 
     final routes = await _routesRepository.get(
@@ -112,14 +99,6 @@ class HomeController extends ChangeNotifier {
     );
 
     if (routes != null && routes.isNotEmpty) {
-      _state = await setRouteAndMarkers(
-        state: state,
-        routes: routes,
-        origin: origin,
-        destination: destination,
-        dot: _dotMarker!,
-      );
-
       await _mapController?.animateCamera(
         fitMap(
           origin.position,
@@ -127,31 +106,33 @@ class HomeController extends ChangeNotifier {
           padding: 100,
         ),
       );
-
-      notifyListeners();
+      state = await setRouteAndMarkers(
+        state: state,
+        routes: routes,
+        origin: origin,
+        destination: destination,
+        dot: _dotMarker!,
+      );
     } else {
-      _state = _state.copyWith(
+      state = state.copyWith(
         fetching: false,
       );
-      notifyListeners();
     }
   }
 
   void confirmOriginOrDestination() {
-    _state = _state.confirmOriginOrDestination();
+    state = state.confirmOriginOrDestination();
     if (originAndDestinationReady) {
       setOriginAndDestination(
-        _state.origin!,
-        _state.destination!,
+        state.origin!,
+        state.destination!,
       );
-    } else {
-      notifyListeners();
     }
   }
 
   Future<void> exchange() async {
-    final origin = _state.destination!;
-    final destination = _state.origin!;
+    final origin = state.destination!;
+    final destination = state.origin!;
     clearData();
     return setOriginAndDestination(origin, destination);
   }
@@ -171,18 +152,15 @@ class HomeController extends ChangeNotifier {
   }
 
   void clearData([bool fetching = false]) {
-    _state = _state.clearOriginAndDestination(fetching);
-    notifyListeners();
+    state = state.clearOriginAndDestination(fetching);
   }
 
   void pickFromMap(bool isOrigin) {
-    _state = _state.setPickFromMap(isOrigin);
-    notifyListeners();
+    state = state.setPickFromMap(isOrigin);
   }
 
   void cancelPickFromMap() {
-    _state = _state.cancelPickFromMap();
-    notifyListeners();
+    state = state.cancelPickFromMap();
   }
 
   Future<void> goToMyPosition() async {
@@ -195,13 +173,12 @@ class HomeController extends ChangeNotifier {
   }
 
   void onCameraMoveStarted() {
-    if (_state.pickFromMap != null) {
-      _state = _state.copyWith(
-        pickFromMap: _state.pickFromMap!.copyWith(
+    if (state.pickFromMap != null) {
+      state = state.copyWith(
+        pickFromMap: state.pickFromMap!.copyWith(
           dragging: true,
         ),
       );
-      notifyListeners();
     }
   }
 
@@ -210,18 +187,17 @@ class HomeController extends ChangeNotifier {
   }
 
   void onCameraIdle() async {
-    if (_state.pickFromMap != null && _cameraPosition != null) {
+    if (state.pickFromMap != null && _cameraPosition != null) {
       final place = await _reverseGeocodeRepository.parse(
         _cameraPosition!,
       );
 
-      _state = _state.copyWith(
-        pickFromMap: _state.pickFromMap!.copyWith(
+      state = state.copyWith(
+        pickFromMap: state.pickFromMap!.copyWith(
           dragging: false,
           place: place,
         ),
       );
-      notifyListeners();
     }
   }
 
