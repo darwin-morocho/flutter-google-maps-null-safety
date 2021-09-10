@@ -11,9 +11,9 @@ import 'package:flutter_meedu/state.dart';
 class OriginAndDestination extends ConsumerWidget {
   const OriginAndDestination({Key? key}) : super(key: key);
   @override
-  Widget build(BuildContext context, watch) {
+  Widget build(BuildContext context, ref) {
     // only build if the origin and destination have changed
-    final controller = watch(
+    final controller = ref.watch(
       homeProvider.select((state) {
         return state.origin != null && state.destination != null;
       }),

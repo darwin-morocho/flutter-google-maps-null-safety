@@ -6,11 +6,11 @@ import 'package:google_maps/app/ui/pages/home/home_page.dart';
 class CancelPickFromMapButton extends ConsumerWidget {
   const CancelPickFromMapButton({Key? key}) : super(key: key);
   @override
-  Widget build(BuildContext context, watch) {
-    final controller = watch(
+  Widget build(BuildContext context, ref) {
+    final visible = ref.select(
       homeProvider.select((_) => _.pickFromMap != null),
     );
-    final visible = controller.state.pickFromMap != null;
+
     if (!visible) {
       return Container();
     }
@@ -27,7 +27,7 @@ class CancelPickFromMapButton extends ConsumerWidget {
             size: 30,
           ),
           color: Colors.white,
-          onPressed: controller.cancelPickFromMap,
+          onPressed: homeProvider.read.cancelPickFromMap,
         ),
       ),
     );

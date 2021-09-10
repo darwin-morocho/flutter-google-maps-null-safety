@@ -12,10 +12,10 @@ class FixedMarker extends ConsumerWidget {
     required this.height,
   }) : super(key: key);
   @override
-  Widget build(BuildContext context, watch) {
-    final pickFromMap = watch(
+  Widget build(BuildContext context, ref) {
+    final pickFromMap = ref.select(
       homeProvider.select((_) => _.pickFromMap),
-    ).state.pickFromMap;
+    );
 
     if (pickFromMap == null) {
       return Container();

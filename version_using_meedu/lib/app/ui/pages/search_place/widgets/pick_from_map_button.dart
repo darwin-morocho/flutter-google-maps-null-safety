@@ -7,12 +7,12 @@ import 'package:flutter_meedu/state.dart';
 class PickFromMapButton extends ConsumerWidget {
   const PickFromMapButton({Key? key}) : super(key: key);
   @override
-  Widget build(BuildContext context, watch) {
-    final originHasFocus = watch(
+  Widget build(BuildContext context, ref) {
+    final originHasFocus = ref.select(
       searchProvider.select((_) => _.originHasFocus),
-    ).originHasFocus;
+    );
 
-    return CupertinoButton( 
+    return CupertinoButton(
       onPressed: () {
         router.pop(
           PickFromMapResponse(originHasFocus),

@@ -7,8 +7,8 @@ import 'package:flutter_meedu/state.dart';
 class SearchResults extends ConsumerWidget {
   const SearchResults({Key? key}) : super(key: key);
   @override
-  Widget build(BuildContext context, watch) {
-    final controller = watch(searchProvider);
+  Widget build(BuildContext context, ref) {
+    final controller = ref.watch(searchProvider);
     final places = controller.places;
     if (places == null) {
       return const Center(

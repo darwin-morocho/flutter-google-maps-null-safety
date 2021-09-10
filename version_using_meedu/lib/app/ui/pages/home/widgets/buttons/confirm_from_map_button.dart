@@ -2,17 +2,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_meedu/state.dart';
-import '../../controller/home_state.dart';
 import '../../home_page.dart' show homeProvider;
 
 class ConfirmFromMapButton extends ConsumerWidget {
   const ConfirmFromMapButton({Key? key}) : super(key: key);
   @override
-  Widget build(BuildContext context, watch) {
-    final controller = watch(
+  Widget build(BuildContext context, ref) {
+    final data = ref.select(
       homeProvider.select((_) => _.pickFromMap),
     );
-    final PickFromMap? data = controller.state.pickFromMap;
+
+    final controller = homeProvider.read;
+
     if (data == null) {
       return Container();
     }

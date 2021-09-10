@@ -18,22 +18,24 @@ class SearchAppBar extends StatelessWidget with PreferredSizeWidget {
       ),
       elevation: 0,
       actions: [
-        Consumer(builder: (context, watch, __) {
-          final controller = watch(searchProvider);
-          final origin = controller.origin;
-          final destination = controller.destination;
-          final bool enabled = origin != null && destination != null;
-          return CupertinoButton(
-            child: const Text("SAVE"),
-            onPressed: enabled
-                ? () {
-                    router.pop(
-                      OriginAndDestinationResponse(origin, destination),
-                    );
-                  }
-                : null,
-          );
-        }),
+        Consumer(
+          builder: (context, ref, __) {
+            final controller = ref.watch(searchProvider);
+            final origin = controller.origin;
+            final destination = controller.destination;
+            final bool enabled = origin != null && destination != null;
+            return CupertinoButton(
+              child: const Text("SAVE"),
+              onPressed: enabled
+                  ? () {
+                      router.pop(
+                        OriginAndDestinationResponse(origin, destination),
+                      );
+                    }
+                  : null,
+            );
+          },
+        ),
       ],
     );
   }

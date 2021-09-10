@@ -25,7 +25,7 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.2
   google_maps_flutter: ^2.0.6
-  flutter_meedu: ^4.1.0
+  flutter_meedu: ^5.0.0
   flutter_cache_manager: ^3.1.2
   permission_handler: ^8.1.1
   geolocator: ^7.1.1

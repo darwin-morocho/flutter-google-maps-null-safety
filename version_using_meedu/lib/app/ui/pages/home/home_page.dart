@@ -16,11 +16,11 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Consumer(
-        builder: (context, watch, loadingWidget) {
+        builder: (context, ref, loadingWidget) {
           // only rebuild if the loading field changes
-          final loading = watch(
+          final loading = ref.select(
             homeProvider.select((_) => _.loading),
-          ).state.loading;
+          );
           if (loading) {
             return loadingWidget!;
           }

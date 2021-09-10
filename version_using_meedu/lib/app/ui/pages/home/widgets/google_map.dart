@@ -17,8 +17,8 @@ class MapView extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Consumer(
-      builder: (_, watch, gpsMessageWidget) {
-        final controller = watch(homeProvider);
+      builder: (_, ref, gpsMessageWidget) {
+        final controller = ref.watch(homeProvider);
         final state = controller.state;
 
         if (!state.gpsEnabled) {

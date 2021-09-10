@@ -7,8 +7,8 @@ import 'package:flutter_meedu/state.dart';
 class WhereAreYouGoingButton extends ConsumerWidget {
   const WhereAreYouGoingButton({Key? key}) : super(key: key);
   @override
-  Widget build(BuildContext context, watch) {
-    final controller = watch(homeProvider);
+  Widget build(BuildContext context, ref) {
+    final controller = ref.watch(homeProvider);
     final state = controller.state;
     final hide =
         controller.originAndDestinationReady || state.fetching || state.pickFromMap != null;
